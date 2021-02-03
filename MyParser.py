@@ -20,16 +20,19 @@ LOCAL_LOG = []
 
 
 def switchScope(scope):
+    """Switches scopes used by statements during execution"""
     global CURRENT_SCOPE
     CURRENT_SCOPE = scope
 
 
 def my_print(*txt):
+    """Utility printing function. Appends text to LOCAL_LOG"""
     for n in txt:
         LOCAL_LOG.append(n)
 
 
 class Token(object):
+    """Represents token identifier and its declared value"""
     def __init__(self, type, value):
         self.type = type
         self.value = value
@@ -42,6 +45,7 @@ class Token(object):
 
 
 class StatementDeclareVariable(object):
+    """Declares a variable in current scope with given name and value"""
     def __init__(self, name, value):
         self.name = name
         self.value = value
@@ -60,6 +64,7 @@ class StatementDeclareVariable(object):
 
 
 class StatementDeclareFunction(object):
+    """Declares a function in global scope with given name and statements(function body)"""
     def __init__(self, name, statements):
         self.name = name
         self.statements = statements
@@ -85,6 +90,7 @@ class StatementDeclareFunction(object):
 
 
 class StatementAdd(object):
+    """Adds value of var2 to var1 and saves result in var1."""
     def __init__(self, var1, var2):
         self.var1 = var1
         self.var2 = var2
@@ -107,6 +113,7 @@ class StatementAdd(object):
 
 
 class StatementPrint(object):
+    """Prints variable name or text(if variable under given name was not found)"""
     def __init__(self, var1):
         self.var1 = var1
 
@@ -126,6 +133,7 @@ class StatementPrint(object):
 
 
 class StatementInvokeFunction(object):
+    """Invokes function with given name by executing all its statement in order."""
     def __init__(self, var1):
         self.var1 = var1
 
@@ -140,23 +148,40 @@ class StatementInvokeFunction(object):
         return var1.INVOKE()
 
 
+
+        
 class Interpreter(object):
+    """Interprets passed program text string. Can be executed to run each interpreted statement."""
     def __init__(self, split_words):
         self.current_word = 0
         self.split_words = split_words
         self.final_program = []
+        
+        self.lookup={
+        "function":self.function_statement,
+        "variable":self.variable_statement,
+        "add":self.add_statement,
+        "print":self.print_statement,
+        "invoke":self.invoke_statement,
+        }
 
     def execute_program(self):
+        """Executes each interpreted statement."""
+   
         for statement in self.final_program:
             statement.execute()
-
+            
     def step(self):
+        """Does one step of interpretation."""
+    
         next_word = self.split_words[self.current_word]
         statement = self.interpret_token(next_word)
         self.final_program.append(statement)
         return self.current_word >= len(self.split_words)
 
+
     def add_statement(self):
+        """Appends statement to program list."""
         self.current_word = self.current_word + 1
         var1 = self.split_words[self.current_word]
         self.current_word = self.current_word + 1
@@ -168,7 +193,13 @@ class Interpreter(object):
         my_print(final_add_statement)
         return final_add_statement
 
+
     def function_statement(self):
+        '''Interprets next words as function statement.
+            Returns:
+            function statement
+        '''
+                
         self.current_word = self.current_word + 1
         function_name = self.split_words[self.current_word]
         self.current_word = self.current_word + 1
@@ -190,6 +221,10 @@ class Interpreter(object):
         return final_function_statement
 
     def variable_statement(self):
+        '''Interprets next words as variable statement.
+            Returns:
+            variable statement
+        '''
         ignore = self.split_words[self.current_word]
         self.current_word = self.current_word + 1
 
@@ -210,6 +245,10 @@ class Interpreter(object):
         return statement
 
     def print_statement(self):
+        '''Interprets next words as print statement.
+            Returns:
+            print statement
+        '''
         ignore = self.split_words[self.current_word]
         self.current_word = self.current_word + 1
 
@@ -220,6 +259,10 @@ class Interpreter(object):
         return statement
 
     def invoke_statement(self):
+        '''Interprets next words as function invocation statement.
+            Returns:
+            function invoke statement
+        '''
         ignore = self.split_words[self.current_word]
         self.current_word = self.current_word + 1
 
@@ -231,20 +274,15 @@ class Interpreter(object):
         return statement
 
     def interpret_token(self, token):
-        if token == "function":
-            return self.function_statement()
+        '''Interprets next words one of possible statements
+        Raises
+        ------
+        Exception
+            Invalid token
+        '''
 
-        if token == "variable":
-            return self.variable_statement()
 
-        if token == "add":
-            return self.add_statement()
-
-        if token == "print":
-            return self.print_statement()
-
-        if token == "invoke":
-            return self.invoke_statement()
+        return self.lookup[token]()
 
         if True:
             raise Exception("Error invalid token:" + token)
@@ -254,7 +292,11 @@ class Interpreter(object):
 
 
 def INTERPRET(text):
-
+    '''Interprets text program
+        Returns:
+        Interpreter with interpreted program
+    '''
+        
     splitted = text.split(" ")
     interpreter = Interpreter(splitted)
 
@@ -266,6 +308,11 @@ def INTERPRET(text):
 
 
 def RUN_PROGRAM(interpreter):
+    '''Runs program interpreted by given interpreter
+        Returns:
+        log of program execution
+    '''
+    
     LOCAL_LOG.clear()
     interpreter.execute_program()
     return LOCAL_LOG

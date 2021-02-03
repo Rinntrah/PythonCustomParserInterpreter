@@ -4,6 +4,7 @@ import MyParser
 
 
 def popup_window(in_text):
+    """Show popup window with text"""
     window = tk.Toplevel()
 
     label = tk.Label(window, text=in_text)
@@ -42,6 +43,7 @@ def save_file():
 
 
 def RUN():
+    """Runs program written in text editor"""
     text = txt_edit.get(1.0, tk.END)
 
     text = text.replace("\n", " ")
