@@ -7,12 +7,12 @@ def popup_window(in_text):
     window = tk.Toplevel()
 
     label = tk.Label(window, text=in_text)
-    label.pack(fill='x', padx=150, pady=55)
+    label.pack(fill="x", padx=150, pady=55)
 
     button_close = tk.Button(window, text="OK!", command=window.destroy)
-    button_close.pack(fill='x')
+    button_close.pack(fill="x")
 
-    
+
 def open_file():
     """Open a file for editing."""
     filepath = askopenfilename(
@@ -25,6 +25,7 @@ def open_file():
         text = input_file.read()
         txt_edit.insert(tk.END, text)
     window.title(f"Executor - {filepath}")
+
 
 def save_file():
     """Save the current file as a new file."""
@@ -39,22 +40,23 @@ def save_file():
         output_file.write(text)
     window.title(f"Executor- {filepath}")
 
+
 def RUN():
     text = txt_edit.get(1.0, tk.END)
-    
-    text=text.replace('\n',' ')
-    text=text[:-1]
-    print('Running following:',text)
-    interpreter=MyParser.INTERPRET(text)
-    
+
+    text = text.replace("\n", " ")
+    text = text[:-1]
+    print("Running following:", text)
+    interpreter = MyParser.INTERPRET(text)
+
     ret = MyParser.RUN_PROGRAM(interpreter)
-    final_string=""
+    final_string = ""
     for txt in ret:
-        final_string=str(final_string)+str(txt)+"\n"
-        
+        final_string = str(final_string) + str(txt) + "\n"
+
     popup_window(str(final_string))
-    
-    
+
+
 window = tk.Tk()
 window.title("Executor")
 window.rowconfigure(0, minsize=800, weight=1)
