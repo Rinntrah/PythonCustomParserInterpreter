@@ -1,0 +1,5 @@
+function hi { print hello }
+function something { variable z = 5 variable x = 150 add x z invoke hi }
+invoke something
+print x
+print x
